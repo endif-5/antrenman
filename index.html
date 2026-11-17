@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0e1013">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Antrenman">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%230e1013%22/%3E%3Crect x=%2218%22 y=%2240%22 width=%2264%22 height=%2220%22 rx=%224%22 fill=%22%23c6f432%22/%3E%3Crect x=%2212%22 y=%2230%22 width=%2214%22 height=%2240%22 rx=%224%22 fill=%22%23c6f432%22/%3E%3Crect x=%2274%22 y=%2230%22 width=%2214%22 height=%2240%22 rx=%224%22 fill=%22%23c6f432%22/%3E%3C/svg%3E">
+<title>Akif – Antrenman Takibi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0e1013; --panel:#171a1f; --panel2:#1e2229; --line:#2a2f37;
+    --text:#eef1f5; --muted:#8d96a3; --accent:#c6f432; --accent-ink:#141a00;
+    --ok:#4ade80; --warn:#fbbf24; --danger:#f87171;
+    --r:14px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  body{padding-bottom:110px}
+  button{font:inherit;color:inherit;cursor:pointer}
+  input{font:inherit}
+  .wrap{max-width:560px;margin:0 auto;padding:16px}
+  header.top{display:flex;align-items:center;justify-content:space-between;padding:6px 0 14px}
+  header.top h1{font-size:20px;margin:0;font-weight:800;letter-spacing:-.02em}
+  header.top h1 span{color:var(--accent)}
+  .tabs{display:flex;gap:6px;background:var(--panel);padding:4px;border-radius:12px;border:1px solid var(--line)}
+  .tabs button{border:0;background:transparent;padding:7px 12px;border-radius:9px;font-size:13px;font-weight:600;color:var(--muted)}
+  .tabs button.on{background:var(--panel2);color:var(--text)}
+  .note{font-size:12.5px;color:var(--muted);background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:9px 12px;margin-bottom:12px}
+  .note.warn{color:var(--warn);border-color:#4a3d16}
+  h2{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:22px 0 10px;font-weight:700}
+  .days{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .day{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:14px;text-align:left;position:relative;min-height:96px}
+  .day b{display:block;font-size:16px;margin-bottom:3px}
+  .day small{color:var(--muted);font-size:12px;line-height:1.35;display:block}
+  .day .tag{position:absolute;top:10px;right:10px;font-size:10.5px;font-weight:700;background:var(--accent);color:var(--accent-ink);padding:3px 7px;border-radius:99px}
+  .day.next{border-color:var(--accent)}
+  .hist{display:flex;flex-direction:column;gap:6px}
+  .hrow{display:flex;justify-content:space-between;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:14px}
+  .hrow span{color:var(--muted);font-size:12.5px}
+  .empty{color:var(--muted);font-size:13.5px;padding:8px 2px}
+  /* workout */
+  .wk-head{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+  .back{border:1px solid var(--line);background:var(--panel);border-radius:10px;width:38px;height:38px;font-size:18px;flex:none}
+  .wk-head h2{margin:0;font-size:19px;text-transform:none;letter-spacing:-.01em;color:var(--text)}
+  .wk-head .date{color:var(--muted);font-size:12.5px}
+  .progress{height:6px;background:var(--panel2);border-radius:99px;overflow:hidden;margin:10px 0 14px}
+  .progress i{display:block;height:100%;background:var(--accent);width:0;transition:width .3s}
+  .ex{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:12px}
+  .ex.done{border-color:#2f4d1a}
+  .ex-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+  .ex-name{font-weight:700;font-size:15.5px;line-height:1.3}
+  .ex-meta{color:var(--muted);font-size:12.5px;margin-top:3px}
+  .vid{flex:none;font-size:12px;font-weight:600;color:var(--accent);text-decoration:none;border:1px solid #3c4a12;padding:5px 9px;border-radius:8px}
+  .last{font-size:12.5px;margin-top:8px;color:var(--muted)}
+  .hint{display:inline-block;margin-top:6px;font-size:11.5px;font-weight:700;padding:3px 8px;border-radius:99px}
+  .hint.up{background:#24360d;color:var(--accent)}
+  .hint.reps{background:#2a2a2a;color:#cfd5dd}
+  .sets{margin-top:10px;display:flex;flex-direction:column;gap:6px}
+  .set{display:grid;grid-template-columns:28px 1fr 1fr 44px;gap:8px;align-items:center}
+  .set .n{color:var(--muted);font-size:12.5px;font-weight:700;text-align:center}
+  .fld{position:relative}
+  .fld input{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 34px 10px 10px;color:var(--text);font-size:16px;font-weight:600;-moz-appearance:textfield}
+  .fld input::-webkit-outer-spin-button,.fld input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  .fld input:focus{outline:none;border-color:#56611f}
+  .fld em{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-style:normal;font-size:11.5px;color:var(--muted);pointer-events:none}
+  .chk{height:42px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);font-size:18px;color:var(--muted)}
+  .chk.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+  .set.on input{border-color:#33401a;color:#d9f7a0}
+  .addset{margin-top:8px;border:1px dashed var(--line);background:transparent;color:var(--muted);border-radius:10px;padding:7px;font-size:12.5px;width:100%}
+  .finish{width:100%;padding:15px;border-radius:var(--r);border:0;background:var(--accent);color:var(--accent-ink);font-weight:800;font-size:15px;margin-top:6px}
+  .finish.ghost{background:var(--panel);color:var(--text);border:1px solid var(--line)}
+  /* timer */
+  .timer{position:fixed;left:0;right:0;bottom:0;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:rgba(14,16,19,.94);backdrop-filter:blur(10px);border-top:1px solid var(--line);display:none}
+  .timer.show{display:block}
+  .timer .in{max-width:560px;margin:0 auto;display:flex;align-items:center;gap:12px}
+  .timer .t{font-size:30px;font-weight:800;font-variant-numeric:tabular-nums;min-width:92px}
+  .timer .t.over{color:var(--accent)}
+  .timer .lbl{flex:1;font-size:12.5px;color:var(--muted);line-height:1.3}
+  .timer button{border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:9px 11px;font-size:13px;font-weight:600}
+  .timer .bar{height:3px;background:var(--panel2);border-radius:99px;margin:0 auto 10px;max-width:560px;overflow:hidden}
+  .timer .bar i{display:block;height:100%;background:var(--accent);width:100%}
+  /* weight */
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+  .wrow{display:flex;gap:8px}
+  .wrow .fld{flex:1}
+  .btn{border:0;background:var(--accent);color:var(--accent-ink);font-weight:800;border-radius:10px;padding:0 18px}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+  .stat{background:var(--panel2);border-radius:10px;padding:10px}
+  .stat small{display:block;color:var(--muted);font-size:11px;margin-bottom:2px}
+  .stat b{font-size:18px}
+  .goal{margin-top:14px}
+  .goal .lbls{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted);margin-bottom:5px}
+  .goal .track{height:8px;background:var(--panel2);border-radius:99px;overflow:hidden}
+  .goal .track i{display:block;height:100%;background:var(--accent)}
+  table.wk{width:100%;border-collapse:collapse;font-size:13.5px}
+  table.wk td,table.wk th{padding:8px 4px;border-bottom:1px solid var(--line);text-align:left}
+  table.wk th{color:var(--muted);font-weight:600;font-size:12px}
+  .del{background:transparent;border:0;color:var(--muted);font-size:15px}
+  .saving{font-size:11.5px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>Akif <span>·</span> Antrenman</h1>
+    <div class="tabs">
+      <button id="tabTrain" class="on">Antrenman</button>
+      <button id="tabWeight">Kilo</button>
+    </div>
+  </header>
+  <div id="status"></div>
+  <main id="app"></main>
+</div>
+
+<div class="timer" id="timer">
+  <div class="bar"><i id="timerBar"></i></div>
+  <div class="in">
+    <div class="t" id="timerT">0:00</div>
+    <div class="lbl" id="timerLbl">Dinlenme</div>
+    <button id="timerPlus">+30 sn</button>
+    <button id="timerSkip">Geç</button>
+  </div>
+</div>
+
+<script>
+/* ---------- Program ---------- */
+const YT = q => "https://www.youtube.com/results?search_query=" + q;
+const DAYS = {
+  UA:{name:"Üst Vücut A", short:"Göğüs, sırt, omuz, kol · ağır", ex:[
+    {id:"bench",n:"Bench Press",s:4,r:"6–8",rest:150,v:YT("bench+press+proper+form")},
+    {id:"bbrow",n:"Barbell Row",s:4,r:"6–8",rest:150,v:YT("barbell+row+proper+form")},
+    {id:"incdb",n:"Incline Dumbbell Press",s:3,r:"8–10",rest:120,v:YT("incline+dumbbell+press+proper+form")},
+    {id:"latpd",n:"Lat Pulldown",s:3,r:"8–12",rest:90,v:YT("lat+pulldown+proper+form")},
+    {id:"cablat",n:"Cable Lateral Raise (tek kol)",s:3,r:"12–15",rest:60,note:"her kol",v:YT("single+arm+cable+lateral+raise+proper+form")},
+    {id:"ropepd",n:"Rope Triceps Pushdown",s:3,r:"10–12",rest:60,v:YT("rope+triceps+pushdown+proper+form")},
+    {id:"ezcurl",n:"EZ Bar Curl",s:3,r:"10–12",rest:60,v:YT("ez+bar+curl+proper+form")}
+  ]},
+  LA:{name:"Alt Vücut A", short:"Squat odaklı", ex:[
+    {id:"squat",n:"Back Squat",s:4,r:"6–8",rest:150,v:YT("barbell+back+squat+proper+form")},
+    {id:"hyper",n:"45° Hyperextension",s:3,r:"10–12",rest:90,v:YT("45+degree+hyperextension+glute+hamstring+proper+form")},
+    {id:"legpress",n:"Leg Press",s:3,r:"10–12",rest:120,v:YT("leg+press+proper+form")},
+    {id:"lylcA",n:"Lying Leg Curl",s:3,r:"10–12",rest:90,v:YT("lying+leg+curl+proper+form")},
+    {id:"stcalf",n:"Standing Calf Raise",s:4,r:"10–15",rest:60,v:YT("standing+calf+raise+proper+form")},
+    {id:"cabcr",n:"Cable Crunch",s:3,r:"12–15",rest:60,v:YT("cable+crunch+proper+form")}
+  ]},
+  UB:{name:"Üst Vücut B", short:"Omuz, sırt, göğüs, kol · hacim", ex:[
+    {id:"ohp",n:"Overhead Press (ayakta, bar)",s:4,r:"6–8",rest:150,v:YT("standing+barbell+overhead+press+proper+form")},
+    {id:"latnt",n:"Lat Pulldown (dar / nötr tutuş)",s:4,r:"8–10",rest:120,v:YT("close+grip+neutral+lat+pulldown+proper+form")},
+    {id:"chpress",n:"Machine Chest Press veya Dumbbell Bench",s:3,r:"10–12",rest:90,v:YT("machine+chest+press+proper+form")},
+    {id:"cabrow",n:"Seated Cable Row",s:3,r:"10–12",rest:90,v:YT("seated+cable+row+proper+form")},
+    {id:"cabfly",n:"Cable Fly",s:3,r:"12–15",rest:60,v:YT("cable+fly+proper+form")},
+    {id:"facepull",n:"Face Pull",s:3,r:"12–15",rest:60,v:YT("face+pull+proper+form")},
+    {id:"incurl",n:"Incline Dumbbell Curl",s:3,r:"10–12",rest:60,v:YT("incline+dumbbell+curl+proper+form")},
+    {id:"skull",n:"Barbell Lying Triceps Extension (EZ bar)",s:3,r:"10–12",rest:60,v:YT("ez+bar+lying+triceps+extension+skull+crusher+proper+form")}
+  ]},
+  LB:{name:"Alt Vücut B", short:"Smith squat odaklı", ex:[
+    {id:"smith",n:"Smith Machine Squat",s:4,r:"6–8",rest:150,v:YT("smith+machine+squat+proper+form")},
+    {id:"bss",n:"Bulgarian Split Squat",s:3,r:"8–10",rest:90,note:"her bacak",v:YT("bulgarian+split+squat+proper+form")},
+    {id:"hack",n:"Hack Squat veya Leg Press",s:3,r:"10–12",rest:120,v:YT("hack+squat+proper+form")},
+    {id:"legext",n:"Leg Extension",s:3,r:"12–15",rest:60,v:YT("leg+extension+proper+form")},
+    {id:"lylcB",n:"Lying Leg Curl",s:3,r:"12–15",rest:60,v:YT("lying+leg+curl+proper+form")},
+    {id:"secalf",n:"Seated Calf Raise",s:4,r:"12–15",rest:60,v:YT("seated+calf+raise+proper+form")},
+    {id:"ccleg",n:"Captain's Chair Leg Raise",s:3,r:"10–15",rest:60,v:YT("captain%27s+chair+leg+raise+proper+form")}
+  ]}
+};
+const ORDER = ["UA","LA","UB","LB"];
+const GOAL_MID = 90, GOAL_END = 95;
+
+/* ---------- State ---------- */
+const state = {
+  view:"home", tab:"train", day:null, sid:null,
+  sessions:{},   // sid -> {day,date,ex:{id:[{w,r,d}]},finished,updated}
+  weights:{},    // date -> {date,kg}
+  mode:"loading" // "db" | "local" | "loading"
+};
+let db=null, uid=null, sessColl=null, wColl=null;
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const iso = d => d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+const today = () => { const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); };
+const fmtDate = s => { const [y,m,d]=s.split("-").map(Number); return new Date(y,m-1,d).toLocaleDateString("tr-TR",{day:"numeric",month:"long",weekday:"short"}); };
+const topOf = r => Number(String(r).split("–").pop());
+
+/* ---------- Storage ---------- */
+const LKEY="akif-antrenman-v1";
+function localLoad(){ try{ const o=JSON.parse(localStorage.getItem(LKEY)||"{}"); state.sessions=o.sessions||{}; state.weights=o.weights||{}; }catch(e){} }
+function localSave(){ try{ localStorage.setItem(LKEY, JSON.stringify({sessions:state.sessions,weights:state.weights})); }catch(e){} }
+
+const writeQ = {}; // sid -> {busy, again, timer}
+function saveSession(sid){
+  if(state.mode!=="db"){ localSave(); return; }
+  const q = writeQ[sid] || (writeQ[sid]={busy:false,again:false,timer:null});
+  clearTimeout(q.timer);
+  q.timer = setTimeout(()=>{ q.timer=null; flush(sid); }, 700);
+}
+async function flush(sid){
+  const q = writeQ[sid];
+  if(q.busy){ q.again=true; return; }
+  q.busy=true; setSaving(true);
+  try{ await sessColl.doc(sid).set(JSON.parse(JSON.stringify(state.sessions[sid]))); }
+  catch(e){ showStatus("Kayıt yapılamadı ("+(e&&e.code||"hata")+"). Değişikliklerin bu sayfa açıkken duruyor.", true); }
+  q.busy=false; setSaving(false);
+  if(q.again){ q.again=false; flush(sid); }
+}
+async function saveWeight(date){
+  if(state.mode!=="db"){ localSave(); return; }
+  try{
+    if(state.weights[date]) await wColl.doc(date).set(state.weights[date]);
+    else await wColl.doc(date).delete();
+  }catch(e){ showStatus("Kilo kaydedilemedi ("+(e&&e.code||"hata")+").", true); }
+}
+function setSaving(on){ const el=$("#saving"); if(el) el.textContent = on ? "Kaydediliyor…" : "Kaydedildi"; }
+function showStatus(msg, warn){ $("#status").innerHTML = msg ? `<div class="note ${warn?"warn":""}">${esc(msg)}</div>` : ""; }
+
+async function initStore(){
+  let user=null;
+  try{
+    if(window.claude && typeof window.claude.use==="function"){
+      [db,user] = await Promise.all([window.claude.use("db"), window.claude.use("user")]);
+      if(user) uid = await user.id();
+    }
+  }catch(e){ db=null; }
+  if(!db || !uid){
+    state.mode="local"; localLoad();
+    showStatus("");
+    render(); return;
+  }
+  state.mode="db";
+  const base = db.doc("data/users/"+uid+"/profile");
+  sessColl = base.collection("sessions");
+  wColl = base.collection("weights");
+  let gotS=false, gotW=false;
+  const timeout = setTimeout(()=>{ if(!gotS||!gotW) showStatus("Kayıtlara henüz ulaşılamadı; bağlantı gelince kendiliğinden yüklenecek.", true); },10000);
+  const done=()=>{ if(gotS&&gotW){ clearTimeout(timeout); showStatus(""); } };
+  sessColl.onSnapshot(snap=>{
+    snap.docChanges().forEach(ch=>{
+      const id=ch.doc.id;
+      if(ch.type==="removed"){ delete state.sessions[id]; return; }
+      // keep local edits of the open session if a write is pending
+      if(writeQ[id] && (writeQ[id].busy || writeQ[id].timer) && state.sid===id) return;
+      state.sessions[id] = JSON.parse(JSON.stringify(ch.doc.data()));
+    });
+    if(!snap.metadata.fromCache){ gotS=true; done(); }
+    if(state.view!=="workout") render();
+  }, e=>{ clearTimeout(timeout); showStatus("Antrenman kayıtları okunamadı ("+e.code+").", true); });
+  wColl.onSnapshot(snap=>{
+    state.weights={}; snap.docs.forEach(d=>{ state.weights[d.id]=d.data(); });
+    if(!snap.metadata.fromCache){ gotW=true; done(); }
+    if(state.tab==="weight") render();
+  }, e=>{ clearTimeout(timeout); showStatus("Kilo kayıtları okunamadı ("+e.code+").", true); });
+  render();
+}
+
+/* ---------- Helpers ---------- */
+function sortedSessions(){ return Object.entries(state.sessions).sort((a,b)=> (b[1].date+(b[1].updated||0)).localeCompare(a[1].date+(a[1].updated||0))); }
+function lastFor(exId, exceptSid){
+  for(const [sid,s] of sortedSessions()){
+    if(sid===exceptSid) continue;
+    const sets=(s.ex&&s.ex[exId]||[]).filter(x=>x.d && x.r);
+    if(sets.length) return {date:s.date, sets};
+  }
+  return null;
+}
+function nextDay(){
+  const fin = sortedSessions().find(([,s])=>s.finished);
+  if(!fin) return "UA";
+  return ORDER[(ORDER.indexOf(fin[1].day)+1)%4];
+}
+function hintFor(ex, last){
+  if(!last) return "";
+  const top=topOf(ex.r);
+  const w=last.sets[0].w;
+  const allTop = last.sets.length>=ex.s && last.sets.every(x=>Number(x.r)>=top && Number(x.w)===Number(w));
+  return allTop ? `<span class="hint up">Hedef tamam → kiloyu artır</span>` : `<span class="hint reps">Aynı kiloyla tekrar eklemeye çalış</span>`;
+}
+
+/* ---------- Views ---------- */
+function render(){
+  $("#tabTrain").classList.toggle("on", state.tab==="train");
+  $("#tabWeight").classList.toggle("on", state.tab==="weight");
+  if(state.tab==="weight") return renderWeight();
+  if(state.view==="workout") return renderWorkout();
+  renderHome();
+}
+
+function renderHome(){
+  const nd = nextDay();
+  const hist = sortedSessions().slice(0,8);
+  $("#app").innerHTML = `
+    <h2>Bugün hangi gün?</h2>
+    <div class="days">
+      ${ORDER.map(k=>`<button class="day ${k===nd?"next":""}" data-day="${k}">
+        ${k===nd?'<span class="tag">Sıradaki</span>':""}
+        <b>${DAYS[k].name}</b><small>${DAYS[k].short}<br>${DAYS[k].ex.length} hareket</small></button>`).join("")}
+    </div>
+    <h2>Son antrenmanlar</h2>
+    <div class="hist">${hist.length ? hist.map(([sid,s])=>{
+      const all=Object.values(s.ex||{}).flat(); const d=all.filter(x=>x.d).length;
+      return `<button class="hrow" data-sid="${esc(sid)}" style="text-align:left;width:100%">
+        <div><b style="font-weight:600">${esc(DAYS[s.day]?DAYS[s.day].name:s.day)}</b><br><span>${fmtDate(s.date)}</span></div>
+        <span>${d} set${s.finished?" · bitti":""}</span></button>`;}).join("")
+      : `<div class="empty">Henüz kayıt yok. Bir gün seçip ilk antrenmanını başlat.</div>`}</div>
+    <h2>Yedek</h2>
+    <div class="card">
+      <div style="font-size:13px;color:var(--muted);margin-bottom:10px">${state.mode==="db"?"Kayıtların hesabında saklanıyor. Yine de istersen yedek alabilirsin.":"Kayıtların sadece bu telefonun tarayıcısında. Tarayıcı verisi silinirse kaybolur: ara sıra yedeği kopyalayıp kendine (WhatsApp, Notlar) gönder."}</div>
+      <div class="wrow"><button class="btn" id="bkCopy" style="padding:11px 14px">Yedeği kopyala</button><button class="finish ghost" id="bkOpen" style="margin:0;padding:11px 14px;width:auto;font-size:14px">Yedeği geri yükle</button></div>
+      <div id="bkMsg" class="saving" style="margin-top:8px"></div>
+      <div id="bkBox" style="display:none;margin-top:10px">
+        <textarea id="bkText" rows="4" style="width:100%;background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px;font-size:13px" placeholder="Kopyaladığın yedeği buraya yapıştır"></textarea>
+        <button class="btn" id="bkLoad" style="margin-top:8px;padding:11px 14px">Yükle</button>
+      </div>
+    </div>`;
+  document.querySelectorAll("[data-day]").forEach(b=>b.onclick=()=>openDay(b.dataset.day));
+  const msg=t=>{ $("#bkMsg").textContent=t; };
+  $("#bkCopy").onclick=async()=>{
+    const txt=JSON.stringify({v:1,sessions:state.sessions,weights:state.weights});
+    try{ await navigator.clipboard.writeText(txt); msg("Kopyalandı. Şimdi kendine bir mesaj olarak yapıştırıp gönder."); }
+    catch(e){ $("#bkBox").style.display="block"; $("#bkText").value=txt; $("#bkText").select(); msg("Otomatik kopyalanamadı: kutudaki metni seçip kopyala."); }
+  };
+  $("#bkOpen").onclick=()=>{ $("#bkBox").style.display="block"; $("#bkText").value=""; $("#bkText").focus(); msg(""); };
+  $("#bkLoad").onclick=async()=>{
+    let o; try{ o=JSON.parse($("#bkText").value); }catch(e){ msg("Bu metin geçerli bir yedek değil."); return; }
+    if(!o||typeof o!=="object"||!o.sessions||!o.weights){ msg("Bu metin geçerli bir yedek değil."); return; }
+    Object.assign(state.sessions,o.sessions); Object.assign(state.weights,o.weights);
+    if(state.mode==="db"){
+      msg("Yükleniyor…");
+      try{ for(const [k,v] of Object.entries(o.sessions)) await sessColl.doc(k).set(v);
+           for(const [k,v] of Object.entries(o.weights)) await wColl.doc(k).set(v); }
+      catch(e){ msg("Yüklenirken hata oldu ("+(e&&e.code||"hata")+")."); return; }
+    } else localSave();
+    renderHome(); $("#bkMsg").textContent="Yedek yüklendi.";
+  };
+  document.querySelectorAll("[data-sid]").forEach(b=>b.onclick=()=>{ const s=state.sessions[b.dataset.sid]; if(s){ state.sid=b.dataset.sid; state.day=s.day; state.view="workout"; render(); window.scrollTo(0,0);} });
+}
+
+function openDay(day){
+  const sid = today()+"-"+day;
+  if(!state.sessions[sid]){
+    const ex={};
+    DAYS[day].ex.forEach(e=>{
+      const last=lastFor(e.id, sid);
+      ex[e.id]=Array.from({length:e.s},(_,i)=>({w: last ? (last.sets[Math.min(i,last.sets.length-1)].w ?? "") : "", r:"", d:false}));
+    });
+    state.sessions[sid]={day, date:today(), ex, finished:false, updated:Date.now()};
+    saveSession(sid);
+  }
+  state.sid=sid; state.day=day; state.view="workout"; render(); window.scrollTo(0,0);
+}
+
+function renderWorkout(){
+  const s = state.sessions[state.sid]; if(!s){ state.view="home"; return render(); }
+  const D = DAYS[s.day];
+  const all = D.ex.flatMap(e=>s.ex[e.id]||[]); const doneN = all.filter(x=>x.d).length;
+  $("#app").innerHTML = `
+    <div class="wk-head">
+      <button class="back" id="back" aria-label="Geri">‹</button>
+      <div style="flex:1"><h2>${esc(D.name)}</h2><div class="date">${fmtDate(s.date)} · <span id="saving" class="saving"></span></div></div>
+    </div>
+    <div class="progress"><i style="width:${all.length?Math.round(doneN/all.length*100):0}%"></i></div>
+    ${D.ex.map(e=>{
+      const sets=s.ex[e.id]||(s.ex[e.id]=[]);
+      const last=lastFor(e.id, state.sid);
+      const exDone = sets.length && sets.every(x=>x.d);
+      return `<section class="ex ${exDone?"done":""}" data-ex="${e.id}">
+        <div class="ex-top">
+          <div><div class="ex-name">${esc(e.n)}</div>
+            <div class="ex-meta">${e.s} × ${e.r}${e.note?" ("+e.note+")":""} · dinlenme ${e.rest>=150?"2–3 dk":e.rest>=120?"2 dk":e.rest+" sn"}</div></div>
+          <a class="vid" href="${e.v}" target="_blank" rel="noopener">İzle ↗</a>
+        </div>
+        <div class="last">${last ? `Son (${fmtDate(last.date)}): ${last.sets.map(x=>`${x.w||0}×${x.r}`).join(", ")}` : "Bu hareket için önceki kayıt yok"}</div>
+        ${hintFor(e,last)}
+        <div class="sets">${sets.map((x,i)=>`
+          <div class="set ${x.d?"on":""}">
+            <div class="n">${i+1}</div>
+            <div class="fld"><input inputmode="decimal" type="number" step="0.5" min="0" value="${esc(x.w)}" data-k="w" data-i="${i}" placeholder="${last&&last.sets[i]?esc(last.sets[i].w):(i>0&&sets[i-1].w!==""?esc(sets[i-1].w):"")}"><em>kg</em></div>
+            <div class="fld"><input inputmode="numeric" type="number" min="0" value="${esc(x.r)}" data-k="r" data-i="${i}" placeholder="${last&&last.sets[i]?esc(last.sets[i].r):e.r}"><em>tekrar</em></div>
+            <button class="chk ${x.d?"on":""}" data-i="${i}" aria-label="Seti tamamla">✓</button>
+          </div>`).join("")}</div>
+        <button class="addset" data-add="1">+ Set ekle</button>
+      </section>`;}).join("")}
+    <button class="finish ${s.finished?"ghost":""}" id="finish">${s.finished?"Antrenman bitti ✓ (geri al)":"Antrenmanı bitir"}</button>`;
+
+  $("#back").onclick=()=>{ state.view="home"; render(); };
+  $("#finish").onclick=()=>{ s.finished=!s.finished; s.updated=Date.now(); saveSession(state.sid); if(s.finished){ stopTimer(); state.view="home"; } render(); window.scrollTo(0,0); };
+  document.querySelectorAll("section.ex").forEach(sec=>{
+    const e = D.ex.find(x=>x.id===sec.dataset.ex);
+    const sets = s.ex[e.id];
+    sec.querySelectorAll("input").forEach(inp=>{
+      inp.oninput=()=>{ sets[+inp.dataset.i][inp.dataset.k]=inp.value; s.updated=Date.now(); saveSession(state.sid); };
+    });
+    sec.querySelectorAll(".chk").forEach(btn=>{
+      btn.onclick=()=>{
+        const st=sets[+btn.dataset.i];
+        if(!st.d){
+          const row=btn.closest(".set");
+          const wIn=row.querySelector('[data-k="w"]'), rIn=row.querySelector('[data-k="r"]');
+          if(st.w==="" && wIn.placeholder) st.w=wIn.placeholder;
+          if(st.r==="" && /^\d+$/.test(rIn.placeholder)) st.r=rIn.placeholder;
+          if(st.r===""){ rIn.focus(); return; }
+          st.d=true; startTimer(e.rest, e.n);
+        } else st.d=false;
+        s.updated=Date.now(); saveSession(state.sid); renderWorkout();
+      };
+    });
+    sec.querySelector("[data-add]").onclick=()=>{ const p=sets[sets.length-1]; sets.push({w:p?p.w:"",r:"",d:false}); saveSession(state.sid); renderWorkout(); };
+  });
+  setSaving(false); if(state.mode!=="db") $("#saving").textContent="Bu cihaza kaydediliyor";
+}
+
+/* ---------- Weight ---------- */
+function renderWeight(){
+  const list = Object.values(state.weights).filter(x=>x&&x.date).sort((a,b)=>b.date.localeCompare(a.date));
+  const avg = arr => arr.length ? arr.reduce((t,x)=>t+Number(x.kg),0)/arr.length : null;
+  const now = new Date(); const ago = n => { const d=new Date(now); d.setDate(d.getDate()-n); return iso(d); };
+  const last7 = list.filter(x=>x.date>ago(7)); const prev7 = list.filter(x=>x.date<=ago(7) && x.date>ago(14));
+  const a7=avg(last7), p7=avg(prev7), first=list.length?Number(list[list.length-1].kg):null;
+  const cur = a7 ?? (list[0]?Number(list[0].kg):null);
+  const pct = (cur&&first) ? Math.max(0,Math.min(100,(cur-first)/(GOAL_END-first)*100)) : 0;
+  // weekly averages (Mon-based)
+  const weeks={}; list.forEach(x=>{ const [y,m,d]=x.date.split("-").map(Number); const dt=new Date(y,m-1,d); const day=(dt.getDay()+6)%7; dt.setDate(dt.getDate()-day); const k=iso(dt); (weeks[k]=weeks[k]||[]).push(x); });
+  const wk = Object.entries(weeks).sort((a,b)=>b[0].localeCompare(a[0])).slice(0,8);
+  const f1=v=>v==null?"–":v.toFixed(1);
+  $("#app").innerHTML = `
+    <div class="card">
+      <div style="font-weight:700;margin-bottom:10px">Sabah kilonu gir</div>
+      <form class="wrow" id="wform">
+        <div class="fld"><input id="wkg" type="number" inputmode="decimal" step="0.1" min="30" max="250" placeholder="${list[0]?esc(list[0].kg):"82.5"}" value="${state.weights[today()]?esc(state.weights[today()].kg):""}"><em>kg</em></div>
+        <button class="btn">Kaydet</button>
+      </form>
+      <div class="stats">
+        <div class="stat"><small>Son 7 gün ort.</small><b>${f1(a7)}</b></div>
+        <div class="stat"><small>Önceki hafta</small><b>${f1(p7)}</b></div>
+        <div class="stat"><small>Fark</small><b style="color:${a7!=null&&p7!=null?(a7-p7>=0?"var(--ok)":"var(--danger)"):"inherit"}">${a7!=null&&p7!=null?((a7-p7>=0?"+":"")+(a7-p7).toFixed(1)):"–"}</b></div>
+      </div>
+      <div class="goal">
+        <div class="lbls"><span>Başlangıç ${first!=null?first.toFixed(1):"–"}</span><span>Ara hedef ${GOAL_MID}</span><span>Hedef ${GOAL_END}+</span></div>
+        <div class="track"><i style="width:${pct}%"></i></div>
+      </div>
+      <div class="note" style="margin:12px 0 0">Hedef hız ayda 0,5–1 kg. İki hafta üst üste ortalama artmıyorsa günde ~200 kcal ekle. Kreatinin ilk haftalarındaki 1–2 kg artış sudur.</div>
+    </div>
+    <h2>Haftalık ortalama</h2>
+    ${wk.length?`<div class="card" style="padding:6px 12px"><table class="wk"><tr><th>Hafta</th><th>Ortalama</th><th>Tartı</th></tr>
+      ${wk.map(([k,a])=>`<tr><td>${fmtDate(k)}</td><td><b>${avg(a).toFixed(1)} kg</b></td><td style="color:var(--muted)">${a.length}</td></tr>`).join("")}</table></div>`:`<div class="empty">Henüz kilo kaydı yok.</div>`}
+    <h2>Tüm kayıtlar</h2>
+    <div class="hist">${list.slice(0,30).map(x=>`<div class="hrow"><div>${fmtDate(x.date)}</div><div><b>${Number(x.kg).toFixed(1)} kg</b> <button class="del" data-del="${x.date}" aria-label="Sil">✕</button></div></div>`).join("")}</div>`;
+  $("#wform").onsubmit=ev=>{ ev.preventDefault(); const v=parseFloat($("#wkg").value.replace(",", ".")); if(!(v>30&&v<250)) return; const d=today(); state.weights[d]={date:d,kg:Math.round(v*10)/10}; saveWeight(d); renderWeight(); };
+  document.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{ delete state.weights[b.dataset.del]; saveWeight(b.dataset.del); renderWeight(); });
+}
+
+/* ---------- Rest timer ---------- */
+let tEnd=0, tTotal=0, tInt=null, actx=null, beeps=[];
+function startTimer(sec, label){
+  try{ actx = actx || new (window.AudioContext||window.webkitAudioContext)(); actx.resume(); }catch(e){ actx=null; }
+  tTotal=sec; tEnd=Date.now()+sec*1000; $("#timerLbl").textContent="Dinlenme · "+label;
+  $("#timer").classList.add("show"); scheduleBeep(); tick(); clearInterval(tInt); tInt=setInterval(tick,250);
+}
+function scheduleBeep(){
+  beeps.forEach(o=>{try{o.stop()}catch(e){}}); beeps=[];
+  if(!actx) return;
+  const at = actx.currentTime + Math.max(0,(tEnd-Date.now())/1000);
+  [0,0.25,0.5].forEach(off=>{ try{ const o=actx.createOscillator(), g=actx.createGain(); o.frequency.value=880; g.gain.setValueAtTime(0.0001,at+off); g.gain.exponentialRampToValueAtTime(0.25,at+off+0.02); g.gain.exponentialRampToValueAtTime(0.0001,at+off+0.18); o.connect(g).connect(actx.destination); o.start(at+off); o.stop(at+off+0.2); beeps.push(o);}catch(e){} });
+}
+function tick(){
+  const left=(tEnd-Date.now())/1000, t=$("#timerT");
+  const a=Math.abs(Math.round(left)); t.textContent=(left<0?"+":"")+Math.floor(a/60)+":"+String(a%60).padStart(2,"0");
+  t.classList.toggle("over", left<=0);
+  $("#timerBar").style.width = Math.max(0,Math.min(100,left/tTotal*100))+"%";
+  if(left<-300) stopTimer();
+}
+function stopTimer(){ clearInterval(tInt); beeps.forEach(o=>{try{o.stop()}catch(e){}}); beeps=[]; $("#timer").classList.remove("show"); }
+$("#timerPlus").onclick=()=>{ tEnd+=30000; tTotal+=30; scheduleBeep(); tick(); };
+$("#timerSkip").onclick=stopTimer;
+
+/* ---------- Tabs ---------- */
+$("#tabTrain").onclick=()=>{ state.tab="train"; render(); };
+$("#tabWeight").onclick=()=>{ state.tab="weight"; render(); };
+
+render();
+initStore();
+</script>
+</body>
+</html>
